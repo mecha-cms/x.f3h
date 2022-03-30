@@ -10,7 +10,7 @@
   },
   "private": true,
   "scripts": {
-    "pack": "pack --clean=false --from=.github/source --js-format=iife --js-name=_ --to=."
+    "pack": "pack --clean=false --from=.factory --js-format=iife --js-name=_ --to=."
   },
   "type": "module"
 }
