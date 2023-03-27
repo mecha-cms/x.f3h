@@ -7,9 +7,6 @@ author: Taufik Nurrohman
 link: 'https://github.com/taufik-nurrohman/f3h'
 type: Markdown
 version: 1.0.0
-
-use:
-  '.\lot\x\asset': 1
 ...
 
 This extension transforms your traditional web pages into modern web pages with AJAX features automatically which allows
