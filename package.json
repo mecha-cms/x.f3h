@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@taufik-nurrohman/document": "*",
-    "@taufik-nurrohman/f3h": "*",
+    "@taufik-nurrohman/f3h": "^1.2.15",
+    "@taufik-nurrohman/from": "*",
     "@taufik-nurrohman/is": "*",
     "@taufik-nurrohman/to": "*"
   },
