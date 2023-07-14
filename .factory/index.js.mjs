@@ -2,6 +2,7 @@ import {
     B,
     D,
     R,
+    W,
     getAttributes,
     getClasses,
     getElements,
@@ -15,7 +16,8 @@ import {
 import F3H from '@taufik-nurrohman/f3h';
 
 import {
-    fromJSON
+    fromJSON,
+    fromQuery
 } from '@taufik-nurrohman/from';
 
 import {
@@ -26,12 +28,10 @@ import {
     toCount
 } from '@taufik-nurrohman/to';
 
-const q = new URLSearchParams(theScript.src.split('?')[1] || "");
-const query = q.get('of');
-const state = fromJSON(q.get('state') || '{}');
+const q = fromQuery(theScript.src.split('?')[1] || "");
 
-const f3h = new F3H(state);
-const elements = getElements(query);
+const f3h = new F3H(q.state);
+const elements = getElements(q.of);
 
 if (toCount(elements)) {
     let noJSClasses = [
@@ -42,6 +42,9 @@ if (toCount(elements)) {
         D.title = 'Loading\u{2026}';
     });
     f3h.on('success', function (response) {
+        if (!response) {
+            return;
+        }
         let r = response.documentElement,
             type = this.lot['content-type'];
         if ('text/html' !== type.split(';')[0]) {
@@ -52,7 +55,7 @@ if (toCount(elements)) {
         // Check for `no-js` class and the like in `<body>` and `<html>` element, then remove it!
         letClasses(B, noJSClasses);
         letClasses(R, noJSClasses);
-        const responseElements = getElements(query, response);
+        const responseElements = getElements(q.of, response);
         elements.forEach((element, index) => {
             if (isSet(responseElements[index])) {
                 setAttributes(element, getAttributes(responseElements[index], false));
@@ -62,4 +65,4 @@ if (toCount(elements)) {
     });
 }
 
-window.F3H = F3H;
+W.F3H = F3H;

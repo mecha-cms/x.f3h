@@ -86,12 +86,46 @@
         }
         return x;
     };
-    var fromJSON = function fromJSON(x) {
-        var value = null;
-        try {
-            value = JSON.parse(x);
-        } catch (e) {}
-        return value;
+
+    function _fromQueryDeep(o, props, value) {
+        var prop = props.split('['),
+            i,
+            j = toCount(prop),
+            k;
+        for (i = 0; i < j - 1; ++i) {
+            k = ']' === prop[i].slice(-1) ? prop[i].slice(0, -1) : prop[i];
+            k = "" === k ? toObjectCount(k) : k;
+            o = o[k] || (o[k] = {});
+        }
+        k = ']' === prop[i].slice(-1) ? prop[i].slice(0, -1) : prop[i];
+        o["" === k ? toObjectCount(o) : k] = value;
+    }
+    var fromQuery = function fromQuery(x, parseValue, defaultValue) {
+        if (parseValue === void 0) {
+            parseValue = true;
+        }
+        if (defaultValue === void 0) {
+            defaultValue = true;
+        }
+        var out = {},
+            q = x && '?' === x[0] ? x.slice(1) : x;
+        if ("" === q) {
+            return out;
+        }
+        q.split('&').forEach(function (v) {
+            var a = v.split('='),
+                key = fromURL(a[0]),
+                value = isSet(a[1]) ? fromURL(a[1]) : defaultValue;
+            value = parseValue ? toValue(value) : value;
+            // `a[b]=c`
+            if (']' === key.slice(-1)) {
+                _fromQueryDeep(out, key, value);
+                // `a=b`
+            } else {
+                out[key] = value;
+            }
+        });
+        return out;
     };
     var fromStates = function fromStates() {
         for (var _len = arguments.length, lot = new Array(_len), _key = 0; _key < _len; _key++) {
@@ -124,6 +158,9 @@
             }
         }
         return out;
+    };
+    var fromURL = function fromURL(x) {
+        return decodeURIComponent(x);
     };
     var fromValue = function fromValue(x) {
         if (isArray(x)) {
@@ -1085,17 +1122,18 @@
         }
     };
     F3H.version = '1.2.15';
-    var q = new URLSearchParams(theScript.src.split('?')[1] || "");
-    var query = q.get('of');
-    var state = fromJSON(q.get('state') || '{}');
-    var f3h = new F3H(state);
-    var elements = getElements(query);
+    var q = fromQuery(theScript.src.split('?')[1] || "");
+    var f3h = new F3H(q.state);
+    var elements = getElements(q.of);
     if (toCount(elements)) {
         var noJSClasses = ['no-js', 'nojs'];
         f3h.on('exit', function () {
             D.title = "Loading\u2026";
         });
         f3h.on('success', function (response) {
+            if (!response) {
+                return;
+            }
             var r = response.documentElement,
                 type = this.lot['content-type'];
             if ('text/html' !== type.split(';')[0]) {
@@ -1106,7 +1144,7 @@
             // Check for `no-js` class and the like in `<body>` and `<html>` element, then remove it!
             letClasses(B$1, noJSClasses);
             letClasses(R, noJSClasses);
-            var responseElements = getElements(query, response);
+            var responseElements = getElements(q.of, response);
             elements.forEach(function (element, index) {
                 if (isSet(responseElements[index])) {
                     setAttributes(element, getAttributes(responseElements[index], false));
@@ -1115,5 +1153,5 @@
             });
         });
     }
-    window.F3H = F3H;
+    W.F3H = F3H;
 })();
